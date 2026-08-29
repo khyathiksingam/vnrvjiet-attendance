@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { GraduationCap, Lock, User, Sun, Moon, AlertCircle, Shield, ArrowRight, Eye, EyeOff, Key } from 'lucide-react';
+import { Lock, User, Sun, Moon, AlertCircle, Shield, ArrowRight, Eye, EyeOff, Key } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 
 export default function Login() {
   const { login } = useAuth();
@@ -54,9 +55,11 @@ export default function Login() {
         
         {/* University Logo & Title */}
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white shadow-xl shadow-blue-500/20 mb-4">
-            <GraduationCap className="w-9 h-9" />
-          </div>
+          <img 
+            src={logoImg} 
+            alt="VNR VJIET Attendance Logo" 
+            className="w-24 h-24 mx-auto rounded-3xl object-cover shadow-xl mb-3 ring-4 ring-blue-600/10"
+          />
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             VNR VJIET
           </h2>

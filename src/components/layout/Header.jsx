@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { Sun, Moon, Shield, GraduationCap, LogOut, User, ChevronDown } from 'lucide-react';
+import { Sun, Moon, Shield, LogOut, User, ChevronDown } from 'lucide-react';
 import AdminPermissionsModal from '../AdminPermissionsModal';
+import logoImg from '../../assets/logo.png';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -17,9 +18,11 @@ export default function Header() {
           
           {/* Logo & University Branding */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white shadow-md">
-              <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7" />
-            </div>
+            <img 
+              src={logoImg} 
+              alt="VNR VJIET Logo" 
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover shadow-sm ring-1 ring-blue-500/20"
+            />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white">
