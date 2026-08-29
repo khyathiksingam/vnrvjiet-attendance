@@ -14,7 +14,9 @@ export default function TodayTimetableCard({ timetableData, onSelectSubject }) {
     );
   }
 
-  const { day, todaySchedule = [], currentPeriod } = timetableData;
+  const day = timetableData.day || 'Today';
+  const periods = timetableData.todaySchedule || timetableData.schedule || [];
+  const currentPeriod = timetableData.currentPeriod;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xs border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -26,18 +28,18 @@ export default function TodayTimetableCard({ timetableData, onSelectSubject }) {
           </h2>
         </div>
         <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
-          {todaySchedule.filter(p => p.isAttendanceRequired).length} Attendance Sessions
+          {periods.filter(p => p.isAttendanceRequired).length} Attendance Sessions
         </span>
       </div>
 
       <div className="p-4 sm:p-5 space-y-3">
-        {todaySchedule.length === 0 ? (
+        {periods.length === 0 ? (
           <div className="py-8 text-center text-slate-500 dark:text-slate-400">
             <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p>No classes scheduled for today ({day}). Enjoy your day off!</p>
           </div>
         ) : (
-          todaySchedule.map((period, idx) => {
+          periods.map((period, idx) => {
             const isCurrent = currentPeriod && currentPeriod.id === period.id;
             const isLunch = period.subject === 'LUNCH';
             const isFree = period.isFreePeriod;
