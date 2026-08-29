@@ -21,12 +21,13 @@ import {
   Save,
   ArrowLeft
 } from 'lucide-react';
+import { getLocalSessions, deleteLocalSession, updateLocalSession } from '../utils/storage';
 
 export default function History({ setTab }) {
   const { user, isCentralMember } = useAuth();
   
-  const [sessions, setSessions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [sessions, setSessions] = useState(() => getLocalSessions());
+  const [loading, setLoading] = useState(false);
 
   // Filters
   const [subjectFilter, setSubjectFilter] = useState('ALL');
@@ -57,10 +58,33 @@ export default function History({ setTab }) {
     fetch(url)
       .then(r => r.ok ? r.json() : { sessions: [] })
       .then(data => {
-        let list = data.sessions || [];
-        setSessions(list);
+        let apiList = data.sessions || [];
+        const localList = getLocalSessions();
+        
+        // Merge without duplicates by ID
+        const mergedMap = new Map();
+        [...localList, ...apiList].forEach(s => {
+          mergedMap.set(String(s.id || s.sessionId), s);
+        });
+        let combined = Array.from(mergedMap.values());
+
+        // Apply client filters if local records exist
+        if (subjectFilter !== 'ALL') combined = combined.filter(s => s.subject === subjectFilter);
+        if (batchFilter !== 'ALL') combined = combined.filter(s => s.batch === batchFilter);
+        if (startDate) combined = combined.filter(s => s.date >= startDate);
+        if (endDate) combined = combined.filter(s => s.date <= endDate);
+
+        setSessions(combined);
       })
-      .catch(err => console.log('History sync:', err))
+      .catch(err => {
+        console.log('Using local sessions:', err);
+        let localList = getLocalSessions();
+        if (subjectFilter !== 'ALL') localList = localList.filter(s => s.subject === subjectFilter);
+        if (batchFilter !== 'ALL') localList = localList.filter(s => s.batch === batchFilter);
+        if (startDate) localList = localList.filter(s => s.date >= startDate);
+        if (endDate) localList = localList.filter(s => s.date <= endDate);
+        setSessions(localList);
+      })
       .finally(() => setLoading(false));
   };
 
@@ -71,6 +95,32 @@ export default function History({ setTab }) {
   // Open Edit / View Modal
   const handleOpenEdit = (sessionId) => {
     const token = sessionStorage.getItem('vnr_token');
+    
+    // Check local sessions first
+    const local = getLocalSessions().find(s => String(s.id) === String(sessionId));
+    if (local) {
+      setEditSessionData({
+        session: {
+          sessionId: local.id,
+          subject: local.subject,
+          courseCode: local.course_code,
+          faculty: local.faculty,
+          room: local.room,
+          batch: local.batch,
+          date: local.date,
+          startTime: local.start_time,
+          endTime: local.end_time,
+          notes: local.notes
+        },
+        records: (local.students || []).map(s => ({
+          rollNumber: s.rollNumber,
+          studentName: s.name || s.rollNumber,
+          status: s.status
+        }))
+      });
+      return;
+    }
+
     fetch(`/api/attendance/${sessionId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -100,9 +150,18 @@ export default function History({ setTab }) {
   const handleSaveEditedAttendance = async () => {
     if (!editSessionData) return;
     const token = sessionStorage.getItem('vnr_token');
+    const sid = editSessionData.session.sessionId;
+
+    // Update local storage
+    updateLocalSession(sid, {
+      students: editSessionData.records.map(r => ({
+        rollNumber: r.rollNumber,
+        status: r.status
+      }))
+    });
 
     try {
-      const res = await fetch(`/api/attendance/${editSessionData.session.sessionId}`, {
+      await fetch(`/api/attendance/${sid}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -115,69 +174,79 @@ export default function History({ setTab }) {
           }))
         })
       });
+    } catch (err) {}
 
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || 'Failed to update attendance');
-      }
-
-      setEditSessionData(null);
-      fetchHistory();
-    } catch (err) {
-      alert(err.message);
-    }
+    setEditSessionData(null);
+    fetchHistory();
   };
 
-  // Delete Attendance (Central Member only)
+  // Delete Attendance
   const handleConfirmDelete = async () => {
     if (!deleteSessionId) return;
     setIsDeleting(true);
     const token = sessionStorage.getItem('vnr_token');
 
+    // Delete locally
+    deleteLocalSession(deleteSessionId);
+
     try {
-      const res = await fetch(`/api/attendance/${deleteSessionId}`, {
+      await fetch(`/api/attendance/${deleteSessionId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
+    } catch (err) {}
 
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || 'Failed to delete');
-      }
-
-      setDeleteSessionId(null);
-      fetchHistory();
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setIsDeleting(false);
-    }
+    setDeleteSessionId(null);
+    setIsDeleting(false);
+    fetchHistory();
   };
 
   // WhatsApp Share using original session data
   const handleShareSession = async (session) => {
     const token = sessionStorage.getItem('vnr_token');
-    const res = await fetch(`/api/attendance/${session.sessionId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    const records = data.records || [];
+    
+    // Check local session
+    const local = getLocalSessions().find(s => String(s.id) === String(session.id || session.sessionId));
+    if (local && local.students) {
+      const presentStudents = local.students.filter(r => r.status === 'PRESENT');
+      const absentStudents = local.students.filter(r => r.status === 'ABSENT');
+      shareOnWhatsApp({
+        subject: local.subject,
+        courseCode: local.course_code,
+        faculty: local.faculty,
+        room: local.room,
+        batch: local.batch,
+        date: local.date,
+        startTime: local.start_time,
+        endTime: local.end_time,
+        presentStudents,
+        absentStudents
+      });
+      return;
+    }
 
-    const presentStudents = records.filter(r => r.status === 'PRESENT');
-    const absentStudents = records.filter(r => r.status === 'ABSENT');
-
-    shareOnWhatsApp({
-      subject: session.subject,
-      courseCode: session.courseCode,
-      faculty: session.faculty,
-      room: session.room,
-      batch: session.batch,
-      date: session.date, // Original Date!
-      startTime: session.startTime, // Original Start Time!
-      endTime: session.endTime, // Original End Time!
-      presentStudents,
-      absentStudents
-    });
+    try {
+      const res = await fetch(`/api/attendance/${session.sessionId || session.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const presentStudents = (data.records || []).filter(r => r.status === 'PRESENT');
+        const absentStudents = (data.records || []).filter(r => r.status === 'ABSENT');
+        shareOnWhatsApp({
+          subject: data.session.subject,
+          courseCode: data.session.courseCode,
+          faculty: data.session.faculty,
+          room: data.session.room,
+          batch: data.session.batch,
+          date: data.session.date,
+          startTime: data.session.startTime,
+          endTime: data.session.endTime,
+          presentStudents,
+          absentStudents
+        });
+      }
+    } catch (e) {}
   };
 
   return (

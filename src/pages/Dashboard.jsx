@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 
 import { TIMETABLE } from '../data/masterData';
+import { getLocalSessions } from '../utils/storage';
 
 // Helper to convert '10:00 AM' to minutes from midnight
 function timeStrToMinutes(timeStr) {
@@ -61,13 +62,27 @@ export default function Dashboard({ setTab, onSelectSubjectForAttendance }) {
     schedule: todaySchedule,
     currentPeriod: findLiveCurrentPeriod(todaySchedule)
   });
-  const [stats, setStats] = useState({
-    totalSessions: 0,
-    todaySessionsCount: 0,
-    todayPresent: 0,
-    todayTotal: 0,
-    todayPercentage: 100
-  });
+  // Calculate local stats helper
+  const computeStats = (extraSessions = []) => {
+    const local = getLocalSessions();
+    const map = new Map();
+    [...local, ...extraSessions].forEach(s => map.set(String(s.id || s.sessionId), s));
+    const all = Array.from(map.values());
+    const todayIso = new Date().toISOString().split('T')[0];
+    const todaySessions = all.filter(s => s.date === todayIso);
+    const todayPres = todaySessions.reduce((acc, s) => acc + (s.present_count || (s.students || []).filter(r => r.status === 'PRESENT').length), 0);
+    const todayTot = todaySessions.reduce((acc, s) => acc + (s.total_students || (s.students || []).length), 0);
+
+    return {
+      totalSessions: all.length,
+      todaySessionsCount: todaySessions.length,
+      todayPresent: todayPres,
+      todayTotal: todayTot,
+      todayPercentage: todayTot > 0 ? Math.round((todayPres / todayTot) * 100) : 100
+    };
+  };
+
+  const [stats, setStats] = useState(() => computeStats());
   const [loading, setLoading] = useState(false);
   const [currentTimeStr, setCurrentTimeStr] = useState('');
   const [currentDateStr, setCurrentDateStr] = useState('');
@@ -92,6 +107,9 @@ export default function Dashboard({ setTab, onSelectSubjectForAttendance }) {
 
   // Fetch timetable and statistics from backend if available
   useEffect(() => {
+    // Recompute stats from local store
+    setStats(computeStats());
+
     Promise.all([
       fetch('/api/timetable/current').then(r => r.ok ? r.json() : null),
       fetch('/api/reports/dashboard-stats').then(r => r.ok ? r.json() : null)
@@ -106,9 +124,15 @@ export default function Dashboard({ setTab, onSelectSubjectForAttendance }) {
             currentPeriod: tt.currentPeriod || findLiveCurrentPeriod(list)
           });
         }
-        if (st) setStats(st);
+        if (st && st.totalSessions > 0) {
+          setStats(st);
+        } else {
+          setStats(computeStats());
+        }
       })
-      .catch(err => console.log('Dashboard backend syncing:', err));
+      .catch(err => {
+        setStats(computeStats());
+      });
   }, []);
 
   const handleTakeAttendance = (period) => {

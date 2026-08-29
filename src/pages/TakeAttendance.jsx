@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { STUDENTS, COURSES, TIMETABLE } from '../data/masterData';
+import { saveLocalSession } from '../utils/storage';
 
 // VNR VJIET Class Attendance System - Strict Batch Visibility
 export default function TakeAttendance({ setTab, preselectedPeriod, onAttendanceSaved }) {
@@ -199,7 +200,7 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
     setNotes('');
   };
 
-  // Save Attendance to Backend SQLite
+  // Save Attendance to Backend SQLite & LocalStorage
   const handleSaveAttendance = async () => {
     setSaving(true);
     setSuccessMessage('');
@@ -216,12 +217,17 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
       room,
       batch,
       notes,
+      submittedBy: user?.displayName || 'Class Representative',
       students: applicableStudents.map(s => ({
         rollNumber: s.rollNumber,
         status: attendanceMap[s.rollNumber] || 'PRESENT'
       }))
     };
 
+    let savedSessionId = Date.now();
+    let savedOk = false;
+
+    // 1. Try Backend API
     try {
       const res = await fetch('/api/attendance', {
         method: 'POST',
@@ -232,12 +238,26 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
         body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to save attendance.');
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data && data.sessionId) {
+          savedSessionId = data.sessionId;
+          savedOk = true;
+        }
       }
+    } catch (apiErr) {
+      console.log('Backend API syncing to local storage:', apiErr);
+    }
 
-      setSuccessMessage(`Attendance saved successfully! Session ID: ${data.sessionId}`);
+    // 2. Always persist locally as well for instant static host support
+    const localRes = saveLocalSession(payload);
+    if (localRes && localRes.ok) {
+      savedOk = true;
+      if (localRes.sessionId) savedSessionId = localRes.sessionId;
+    }
+
+    if (savedOk) {
+      setSuccessMessage(`Attendance saved successfully! (Session ID: ${savedSessionId})`);
       
       // Trigger celebration confetti
       try {
@@ -249,11 +269,10 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
       } catch (e) {}
 
       if (onAttendanceSaved) onAttendanceSaved();
-    } catch (err) {
-      setErrorMessage(err.message || 'Error saving attendance');
-    } finally {
-      setSaving(false);
+    } else {
+      setErrorMessage('Could not save attendance. Please check input values.');
     }
+    setSaving(false);
   };
 
   // Share on WhatsApp
