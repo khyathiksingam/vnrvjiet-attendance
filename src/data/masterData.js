@@ -755,7 +755,7 @@ export const TIMETABLE = {
 export const USERS_SEED = [
   {
     username: 'admin',
-    displayName: 'Administrator (Central Member)',
+    displayName: 'C.Rithvik',
     role: 'admin',
     groupName: 'Administration',
     defaultPassword: 'admin'

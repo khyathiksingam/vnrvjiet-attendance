@@ -16,7 +16,17 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const saved = sessionStorage.getItem('vnr_user');
-      return saved ? JSON.parse(saved) : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.displayName === 'Potta Devika' || parsed.displayName === 'Attendance Admin' || parsed.displayName === 'Administrator (Central Member)') {
+          parsed.displayName = 'C.Rithvik';
+          parsed.dept = 'CSE';
+          parsed.role = 'ADMIN';
+          sessionStorage.setItem('vnr_user', JSON.stringify(parsed));
+        }
+        return parsed;
+      }
+      return null;
     } catch (e) {
       return null;
     }
