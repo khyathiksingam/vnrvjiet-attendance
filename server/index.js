@@ -9,6 +9,13 @@ import timetableRoutes from './routes/timetableRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import auditRoutes from './routes/auditRoutes.js';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.join(__dirname, '..', 'dist');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -25,6 +32,15 @@ app.use('/api/audit', auditRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// Serve built frontend assets in production
+app.use(express.static(distPath));
+
+// SPA Client-side routing fallback
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Initialize database and start server
