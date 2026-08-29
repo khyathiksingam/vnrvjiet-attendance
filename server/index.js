@@ -37,10 +37,12 @@ app.get('/api/health', (req, res) => {
 // Serve built frontend assets in production
 app.use(express.static(distPath));
 
-// SPA Client-side routing fallback
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) return next();
-  res.sendFile(path.join(distPath, 'index.html'));
+// SPA Client-side routing fallback (Express 5 compatible)
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api')) {
+    return res.sendFile(path.join(distPath, 'index.html'));
+  }
+  next();
 });
 
 // Initialize database and start server

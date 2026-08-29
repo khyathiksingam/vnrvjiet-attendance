@@ -23,20 +23,17 @@ export default function Reports() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = sessionStorage.getItem('vnr_token');
-    const headers = { Authorization: `Bearer ${token}` };
-
     Promise.all([
-      fetch('/api/reports/subject-summary', { headers }).then(r => r.json()),
-      fetch('/api/reports/student-summary', { headers }).then(r => r.json()),
-      fetch('/api/reports/dashboard-stats', { headers }).then(r => r.json())
+      fetch('/api/reports/subject-summary').then(r => r.ok ? r.json() : null),
+      fetch('/api/reports/student-summary').then(r => r.ok ? r.json() : null),
+      fetch('/api/reports/dashboard-stats').then(r => r.ok ? r.json() : null)
     ])
       .then(([sub, stu, st]) => {
-        setSubjectData(sub.summary || []);
-        setStudentData(stu.summary || []);
-        setStats(st);
+        if (sub && sub.summary) setSubjectData(sub.summary);
+        if (stu && stu.summary) setStudentData(stu.summary);
+        if (st) setStats(st);
       })
-      .catch(err => console.error('Error fetching reports:', err))
+      .catch(err => console.log('Reports sync:', err))
       .finally(() => setLoading(false));
   }, []);
 

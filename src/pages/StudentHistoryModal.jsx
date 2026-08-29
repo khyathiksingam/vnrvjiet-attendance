@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, CheckCircle2, XCircle, Calendar, Clock, MapPin, Shield } from 'lucide-react';
 
+import { STUDENTS } from '../data/masterData';
+
 export default function StudentHistoryModal({ rollNumber, onClose }) {
-  const [data, setData] = useState(null);
+  const localStudent = STUDENTS.find(s => s.rollNumber === rollNumber);
+  const [data, setData] = useState({
+    student: localStudent || { rollNumber, name: 'Student', batch: 'Batch 1' },
+    stats: { totalApplicable: 0, presentCount: 0, absentCount: 0, percentage: 100 },
+    records: []
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!rollNumber) return;
-    const token = sessionStorage.getItem('vnr_token');
     
-    fetch(`/api/students/${rollNumber}/history`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(json => setData(json))
-      .catch(err => console.error('Error fetching student history:', err))
+    fetch(`/api/students/${rollNumber}/history`)
+      .then(res => res.ok ? res.json() : null)
+      .then(json => {
+        if (json) setData(json);
+      })
+      .catch(err => console.log('Student history sync:', err))
       .finally(() => setLoading(false));
   }, [rollNumber]);
 

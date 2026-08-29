@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TIMETABLE } from '../../server/data/masterData.js';
+import { TIMETABLE } from '../data/masterData';
 import { Calendar, Clock, MapPin, User, Users, Info } from 'lucide-react';
 
 export default function TimetablePage() {

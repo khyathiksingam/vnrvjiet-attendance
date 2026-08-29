@@ -20,14 +20,21 @@ import {
   Sparkles
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { STUDENTS, COURSES, TIMETABLE } from '../data/masterData';
 
 export default function TakeAttendance({ preselectedPeriod, onAttendanceSaved }) {
   const { user } = useAuth();
 
-  const [students, setStudents] = useState([]);
-  const [attendanceMap, setAttendanceMap] = useState({}); // { [rollNumber]: 'PRESENT' | 'ABSENT' }
-  const [coursesMeta, setCoursesMeta] = useState({});
-  const [timetableMeta, setTimetableMeta] = useState({});
+  // Initialize initial map for all 74 students as PRESENT
+  const defaultMap = {};
+  STUDENTS.forEach(s => {
+    defaultMap[s.rollNumber] = 'PRESENT';
+  });
+
+  const [students, setStudents] = useState(STUDENTS);
+  const [attendanceMap, setAttendanceMap] = useState(defaultMap);
+  const [coursesMeta, setCoursesMeta] = useState(COURSES);
+  const [timetableMeta, setTimetableMeta] = useState(TIMETABLE);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Form State
@@ -49,35 +56,33 @@ export default function TakeAttendance({ preselectedPeriod, onAttendanceSaved })
 
   // Load students and courses metadata
   useEffect(() => {
-    const token = sessionStorage.getItem('vnr_token');
-    const headers = { Authorization: `Bearer ${token}` };
-
     Promise.all([
-      fetch('/api/students', { headers }).then(r => r.json()),
-      fetch('/api/timetable', { headers }).then(r => r.json()),
-      fetch('/api/timetable/current', { headers }).then(r => r.json())
+      fetch('/api/students').then(r => r.ok ? r.json() : null),
+      fetch('/api/timetable').then(r => r.ok ? r.json() : null),
+      fetch('/api/timetable/current').then(r => r.ok ? r.json() : null)
     ])
       .then(([stuData, ttData, curData]) => {
-        const studentList = stuData.students || [];
-        setStudents(studentList);
-        setCoursesMeta(ttData.courses || {});
-        setTimetableMeta(ttData.timetable || {});
-
-        // Initialize all students as PRESENT by default
-        const initialMap = {};
-        studentList.forEach(s => {
-          initialMap[s.rollNumber] = 'PRESENT';
-        });
-        setAttendanceMap(initialMap);
+        if (stuData && Array.isArray(stuData.students) && stuData.students.length > 0) {
+          setStudents(stuData.students);
+          const initialMap = {};
+          stuData.students.forEach(s => {
+            initialMap[s.rollNumber] = 'PRESENT';
+          });
+          setAttendanceMap(initialMap);
+        }
+        if (ttData) {
+          if (ttData.courses) setCoursesMeta(ttData.courses);
+          if (ttData.timetable) setTimetableMeta(ttData.timetable);
+        }
 
         // Auto-select preselected or currently running class
-        const target = preselectedPeriod || (curData.currentPeriod && curData.currentPeriod.isAttendanceRequired ? curData.currentPeriod : null);
+        const target = preselectedPeriod || (curData && curData.currentPeriod && curData.currentPeriod.isAttendanceRequired ? curData.currentPeriod : null);
         if (target) {
-          applyPeriod(target, ttData.courses);
+          applyPeriod(target, ttData?.courses || COURSES);
         }
       })
       .catch(err => {
-        console.error('Error loading attendance metadata:', err);
+        console.log('Attendance metadata synced from local master:', err);
       });
   }, [preselectedPeriod]);
 

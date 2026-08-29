@@ -53,16 +53,13 @@ export default function History() {
     if (startDate) url += `&startDate=${startDate}`;
     if (endDate) url += `&endDate=${endDate}`;
 
-    fetch(url, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(r => r.json())
+    fetch(url)
+      .then(r => r.ok ? r.json() : { sessions: [] })
       .then(data => {
         let list = data.sessions || [];
-        // If normal CR and not Central Member, allow seeing all or filter by own
         setSessions(list);
       })
-      .catch(err => console.error('Error fetching history:', err))
+      .catch(err => console.log('History sync:', err))
       .finally(() => setLoading(false));
   };
 

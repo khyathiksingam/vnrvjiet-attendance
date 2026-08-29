@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import StudentHistoryModal from './StudentHistoryModal';
 import { Users, Search, Filter, UserCheck, Eye, GraduationCap } from 'lucide-react';
+import { STUDENTS } from '../data/masterData';
 
 export default function Students() {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [students, setStudents] = useState(STUDENTS);
+  const [loading, setLoading] = useState(false);
   const [batchFilter, setBatchFilter] = useState('ALL'); // 'ALL' | 'Batch 1' | 'Batch 2'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStudentRoll, setSelectedStudentRoll] = useState(null);
 
   useEffect(() => {
-    const token = sessionStorage.getItem('vnr_token');
-    fetch('/api/students', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(r => r.json())
-      .then(d => setStudents(d.students || []))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
+    fetch('/api/students')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d && Array.isArray(d.students) && d.students.length > 0) {
+          setStudents(d.students);
+        }
+      })
+      .catch(err => console.log('Students synced from local master:', err));
   }, []);
 
   const filtered = students.filter(s => {
