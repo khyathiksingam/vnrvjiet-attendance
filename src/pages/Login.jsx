@@ -63,7 +63,7 @@ export default function Login() {
             CLASS ATTENDANCE SYSTEM
           </p>
           <div className="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-200/70 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300">
-            <span>CSE-CYS</span> • <span>II Year</span> • <span>III Semester</span> • <span>Section B</span>
+            <span>CSE-CYS</span> • <span>II Year</span> • <span>I Semester</span> • <span>Section B</span>
           </div>
         </div>
 

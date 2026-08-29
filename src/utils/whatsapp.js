@@ -107,7 +107,7 @@ export function generateWhatsAppMessage({
 
   const lines = [
     'VNR VJIET - CLASS ATTENDANCE',
-    'CSE-CYS | II Year | III Semester | Section B',
+    'CSE-CYS | II Year | I Semester | Section B',
     '',
     `Subject: ${subject || 'N/A'}`,
     `Course Code: ${courseCode || 'N/A'}`,

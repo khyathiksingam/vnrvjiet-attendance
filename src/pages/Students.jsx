@@ -47,7 +47,7 @@ export default function Students() {
             Students Roster & Attendance History
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            CSE-CYS | II Year | III Semester | Section B • Click on any student to view complete attendance history
+            CSE-CYS | II Year | I Semester | Section B • Click on any student to view complete attendance history
           </p>
         </div>
 

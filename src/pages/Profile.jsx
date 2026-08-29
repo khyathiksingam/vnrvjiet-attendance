@@ -77,7 +77,7 @@ export default function Profile() {
               Username: <strong className="font-mono text-slate-700 dark:text-slate-300">{user?.username}</strong> • Role: {user?.role}
             </p>
             <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
-              CSE-CYS | II Year | III Semester | Section B
+              CSE-CYS | II Year | I Semester | Section B
             </p>
           </div>
         </div>

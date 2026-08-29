@@ -8,7 +8,7 @@ export default function Footer() {
           VNR VIGNANA JYOTHI INSTITUTE OF ENGINEERING & TECHNOLOGY
         </p>
         <p className="mt-1">
-          B.Tech | CSE-CYS | II Year | III Semester | Section B • Academic Year 2026–2027 • Regulation R25
+          B.Tech | CSE-CYS | II Year | I Semester | Section B • Academic Year 2026–2027 • Regulation R25
         </p>
         <p className="mt-2 text-slate-400 dark:text-slate-500 text-[11px]">
           Class Attendance & Management ERP System

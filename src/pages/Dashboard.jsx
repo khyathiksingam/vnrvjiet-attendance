@@ -80,7 +80,7 @@ export default function Dashboard({ setTab, onSelectSubjectForAttendance }) {
             </h1>
             
             <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">
-              CSE-CYS | II Year | III Semester | Section B
+              CSE-CYS | II Year | I Semester | Section B
             </p>
           </div>
 

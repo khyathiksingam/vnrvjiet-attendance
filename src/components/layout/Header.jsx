@@ -27,7 +27,7 @@ export default function Header() {
                 </span>
               </div>
               <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400">
-                CSE-CYS | II Year | III Semester | Section B
+                CSE-CYS | II Year | I Semester | Section B
               </p>
             </div>
           </div>

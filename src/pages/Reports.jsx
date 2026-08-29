@@ -103,7 +103,7 @@ export default function Reports() {
               REPORTS & ANALYTICS
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              CSE-CYS | II Year | III Semester | Section B
+              CSE-CYS | II Year | I Semester | Section B
             </span>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">
@@ -354,7 +354,7 @@ export default function Reports() {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-500 dark:text-slate-400">Regulation & Semester</span>
-                <strong className="text-slate-900 dark:text-white">R25 • Semester III</strong>
+                <strong className="text-slate-900 dark:text-white">R25 • Semester I</strong>
               </div>
             </div>
           </div>

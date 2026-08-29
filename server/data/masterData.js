@@ -5,12 +5,12 @@ export const COLLEGE_INFO = {
   programme: 'B.Tech',
   branch: 'CSE-CYS',
   year: 'II Year',
-  semester: 'III',
+  semester: 'I',
   section: 'Section B',
   sectionLetter: 'B',
   academicYear: '2026–2027',
   regulation: 'R25',
-  tagline: 'CSE-CYS | II Year | III Semester | Section B'
+  tagline: 'CSE-CYS | II Year | I Semester | Section B'
 };
 
 export const COURSES = {

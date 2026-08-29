@@ -193,7 +193,7 @@ export default function History() {
               ATTENDANCE HISTORY
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              CSE-CYS | II Year | III Semester | Section B
+              CSE-CYS | II Year | I Semester | Section B
             </span>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">

@@ -20,7 +20,7 @@ export default function TimetablePage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200 text-xs font-bold uppercase">
-              SEMESTER III TIMETABLE
+              SEMESTER I TIMETABLE
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400">
               Regulation R25 • Academic Year 2026–2027
@@ -30,7 +30,7 @@ export default function TimetablePage() {
             Weekly Class & Lab Schedule
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            CSE-CYS | II Year | III Semester | Section B • Mon–Sat Schedule with Continuous Blocks
+            CSE-CYS | II Year | I Semester | Section B • Mon–Sat Schedule with Continuous Blocks
           </p>
         </div>
       </div>
