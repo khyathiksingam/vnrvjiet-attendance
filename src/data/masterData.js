@@ -754,38 +754,10 @@ export const TIMETABLE = {
 
 export const USERS_SEED = [
   {
-    username: 'girl_cr_1',
-    displayName: 'Girl CR 1',
-    role: 'class_representative',
-    groupName: 'Girls',
-    defaultPassword: 'cr1'
-  },
-  {
-    username: 'girl_cr_2',
-    displayName: 'Girl CR 2',
-    role: 'class_representative',
-    groupName: 'Girls',
-    defaultPassword: 'cr2'
-  },
-  {
-    username: 'boy_cr_1',
-    displayName: 'Boy CR 1',
-    role: 'class_representative',
-    groupName: 'Boys',
-    defaultPassword: 'cr1'
-  },
-  {
-    username: 'boy_cr_2',
-    displayName: 'Boy CR 2',
-    role: 'class_representative',
-    groupName: 'Boys',
-    defaultPassword: 'cr2'
-  },
-  {
-    username: 'central_member',
-    displayName: 'Central Member',
-    role: 'central_member',
-    groupName: 'Central',
+    username: 'admin',
+    displayName: 'Administrator (Central Member)',
+    role: 'admin',
+    groupName: 'Administration',
     defaultPassword: 'admin'
   }
 ];

@@ -18,11 +18,15 @@ import {
   CheckCircle2, 
   Save,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  Key,
+  Lock,
+  X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { STUDENTS, COURSES, TIMETABLE } from '../data/masterData';
 import { saveLocalSession } from '../utils/storage';
+import { getAdminSettings } from '../components/AdminPermissionsModal';
 
 // VNR VJIET Class Attendance System - Strict Batch Visibility
 export default function TakeAttendance({ setTab, preselectedPeriod, onAttendanceSaved }) {
@@ -200,8 +204,40 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
     setNotes('');
   };
 
+  // Passcode verification states
+  const [showPasscodeModal, setShowPasscodeModal] = useState(false);
+  const [enteredPasscode, setEnteredPasscode] = useState('');
+  const [passcodeError, setPasscodeError] = useState('');
+
+  // Initiate Save (verifies if passcode is needed by Admin)
+  const handleInitiateSave = () => {
+    const adminSettings = getAdminSettings();
+    const isAdminAuth = sessionStorage.getItem('vnr_admin_auth') === 'true';
+
+    if (adminSettings && adminSettings.requireAccessCode && !isAdminAuth) {
+      setEnteredPasscode('');
+      setPasscodeError('');
+      setShowPasscodeModal(true);
+    } else {
+      executeSaveAttendance();
+    }
+  };
+
+  const handleVerifyPasscodeAndSave = (e) => {
+    e.preventDefault();
+    const adminSettings = getAdminSettings();
+    const requiredCode = (adminSettings?.crAccessCode || 'VNR2026').trim().toUpperCase();
+
+    if (enteredPasscode.trim().toUpperCase() === requiredCode) {
+      setShowPasscodeModal(false);
+      executeSaveAttendance();
+    } else {
+      setPasscodeError('Invalid CR Access Code. Please ask the Admin for today\'s code.');
+    }
+  };
+
   // Save Attendance to Backend SQLite & LocalStorage
-  const handleSaveAttendance = async () => {
+  const executeSaveAttendance = async () => {
     setSaving(true);
     setSuccessMessage('');
     setErrorMessage('');
@@ -649,7 +685,7 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
 
             {/* Save Attendance Button */}
             <button
-              onClick={handleSaveAttendance}
+              onClick={handleInitiateSave}
               disabled={saving}
               className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50"
             >
@@ -661,6 +697,63 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
 
         </div>
       </div>
+
+      {/* CR Passcode Verification Modal (if enabled by Admin) */}
+      {showPasscodeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm">
+                <Lock className="w-4 h-4" />
+                <span>CR Access Passcode Required</span>
+              </div>
+              <button
+                onClick={() => setShowPasscodeModal(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              The Administrator has enabled security protection. Please enter the CR Access Code given by the Admin to save this session.
+            </p>
+
+            {passcodeError && (
+              <div className="p-2.5 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 text-red-700 dark:text-red-300 text-xs font-semibold">
+                {passcodeError}
+              </div>
+            )}
+
+            <form onSubmit={handleVerifyPasscodeAndSave} className="space-y-3">
+              <input
+                type="text"
+                value={enteredPasscode}
+                onChange={(e) => setEnteredPasscode(e.target.value.toUpperCase())}
+                placeholder="Enter Access Code"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono font-bold text-center text-base tracking-widest text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
+                autoFocus
+              />
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPasscodeModal(false)}
+                  className="flex-1 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md"
+                >
+                  Verify & Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );
