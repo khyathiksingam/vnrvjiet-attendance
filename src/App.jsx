@@ -33,16 +33,17 @@ function AppContent() {
             onSelectSubjectForAttendance={handleSelectSubjectForAttendance} 
           />
         )}
-        {currentTab === 'timetable' && <TimetablePage />}
+        {currentTab === 'timetable' && <TimetablePage setTab={setCurrentTab} />}
         {currentTab === 'attendance' && (
           <TakeAttendance 
+            setTab={setCurrentTab}
             preselectedPeriod={preselectedPeriod}
             onAttendanceSaved={() => setPreselectedPeriod(null)}
           />
         )}
-        {currentTab === 'history' && <History />}
-        {currentTab === 'students' && <Students />}
-        {currentTab === 'reports' && <Reports />}
+        {currentTab === 'history' && <History setTab={setCurrentTab} />}
+        {currentTab === 'students' && <Students setTab={setCurrentTab} />}
+        {currentTab === 'reports' && <Reports setTab={setCurrentTab} />}
       </main>
 
       <Footer />

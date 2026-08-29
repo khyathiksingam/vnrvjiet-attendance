@@ -22,11 +22,16 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     try {
       const root = document.documentElement;
+      const body = document.body;
       if (theme === 'dark') {
         root.classList.add('dark');
+        body?.classList.add('dark');
+        root.setAttribute('data-theme', 'dark');
         root.style.colorScheme = 'dark';
       } else {
         root.classList.remove('dark');
+        body?.classList.remove('dark');
+        root.setAttribute('data-theme', 'light');
         root.style.colorScheme = 'light';
       }
       localStorage.setItem('vnr_theme', theme);

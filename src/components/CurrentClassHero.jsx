@@ -4,20 +4,37 @@ import { PlayCircle, Clock, MapPin, User, Users, AlertCircle, ArrowRight } from 
 export default function CurrentClassHero({ currentPeriod, onTakeAttendance }) {
   if (!currentPeriod || !currentPeriod.isAttendanceRequired) {
     return (
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-slate-700/50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-700/60 flex items-center justify-center text-slate-400">
-              <Clock className="w-6 h-6" />
+      <div className="bg-gradient-to-r from-slate-800 via-slate-850 to-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-slate-700/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-slate-700/60 border border-slate-600/40 flex items-center justify-center text-slate-300 shrink-0">
+              <Clock className="w-6 h-6 text-blue-400" />
             </div>
             <div>
-              <span className="text-xs uppercase tracking-wider font-bold text-slate-400">Current Status</span>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-100">No class currently running</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                  CLASS STATUS
+                </span>
+                <span className="text-xs text-slate-400 font-medium">
+                  Timetable Hours: 10:00 AM – 4:40 PM
+                </span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mt-0.5">
+                No class currently in session
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Classes for today have concluded or haven't started yet.
+              </p>
             </div>
           </div>
-          <span className="text-xs px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300">
-            Outside Active Class Hours
-          </span>
+
+          <button
+            onClick={() => onTakeAttendance({ subject: 'PSA', startTime: '10:00 AM', endTime: '11:00 AM' })}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 self-start sm:self-auto"
+          >
+            <span>Record Attendance</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     );

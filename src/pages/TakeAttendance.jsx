@@ -17,12 +17,13 @@ import {
   AlertCircle, 
   CheckCircle2, 
   Save,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { STUDENTS, COURSES, TIMETABLE } from '../data/masterData';
 
-export default function TakeAttendance({ preselectedPeriod, onAttendanceSaved }) {
+export default function TakeAttendance({ setTab, preselectedPeriod, onAttendanceSaved }) {
   const { user } = useAuth();
 
   // Initialize initial map for all 74 students as PRESENT
@@ -273,11 +274,20 @@ export default function TakeAttendance({ preselectedPeriod, onAttendanceSaved })
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-slate-200 dark:border-slate-800 transition-colors">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 mb-2">
+              {setTab && (
+                <button
+                  onClick={() => setTab('dashboard')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Dashboard</span>
+                </button>
+              )}
               <span className="px-2.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200 text-xs font-bold uppercase">
                 TAKE ATTENDANCE
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">
+              <span className="hidden sm:inline text-xs text-slate-500 dark:text-slate-400">
                 CSE-CYS | II Year | I Semester | Section B
               </span>
             </div>
