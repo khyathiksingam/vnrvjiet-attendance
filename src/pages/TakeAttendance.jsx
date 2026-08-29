@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { shareOnWhatsApp } from '../utils/whatsapp';
 import { 
@@ -121,28 +121,37 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
     }
   };
 
-  // Filter students based on Batch and Search Query
-  const displayedStudents = students.filter(s => {
-    // Batch filter
-    if (batch === 'Batch 1' && s.batch !== 'Batch 1') return false;
-    if (batch === 'Batch 2' && s.batch !== 'Batch 2') return false;
+  // Filter and sort students based on Batch and Search Query
+  const displayedStudents = useMemo(() => {
+    let list = [...students];
+    if (batch === 'Batch 1') {
+      list = list.filter(s => s.batch === 'Batch 1');
+    } else if (batch === 'Batch 2') {
+      list = list.filter(s => s.batch === 'Batch 2');
+    } else {
+      // Non-batch regular class (All Students): Strict sort - All Regulars (25071...) first, then LEs (26075...)
+      list.sort((a, b) => {
+        const isALe = a.rollNumber.startsWith('26075');
+        const isBLe = b.rollNumber.startsWith('26075');
+        if (isALe !== isBLe) return isALe ? 1 : -1;
+        return a.rollNumber.localeCompare(b.rollNumber);
+      });
+    }
 
-    // Search query filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchRoll = s.rollNumber.toLowerCase().includes(q);
-      const matchName = s.name.toLowerCase().includes(q);
-      return matchRoll || matchName;
+      list = list.filter(s => s.rollNumber.toLowerCase().includes(q) || s.name.toLowerCase().includes(q));
     }
-    return true;
-  });
+
+    return list.map((s, idx) => ({ ...s, sNo: idx + 1 }));
+  }, [students, batch, searchQuery]);
 
   // Calculate Live Statistics
-  const applicableStudents = students.filter(s => {
-    if (batch === 'Batch 1') return s.batch === 'Batch 1';
-    if (batch === 'Batch 2') return s.batch === 'Batch 2';
-    return true;
-  });
+  const applicableStudents = useMemo(() => {
+    if (batch === 'Batch 1') return students.filter(s => s.batch === 'Batch 1');
+    if (batch === 'Batch 2') return students.filter(s => s.batch === 'Batch 2');
+    return students;
+  }, [students, batch]);
 
   const totalCount = applicableStudents.length;
   const presentStudents = applicableStudents.filter(s => attendanceMap[s.rollNumber] === 'PRESENT');

@@ -21,14 +21,27 @@ export default function Students({ setTab }) {
       .catch(err => console.log('Students synced from local master:', err));
   }, []);
 
-  const filtered = students.filter(s => {
-    if (batchFilter !== 'ALL' && s.batch !== batchFilter) return false;
+  const filtered = React.useMemo(() => {
+    let list = [...students];
+    if (batchFilter !== 'ALL') {
+      list = list.filter(s => s.batch === batchFilter);
+    } else {
+      // Non-batch times (ALL): Regulars first, then LEs
+      list.sort((a, b) => {
+        const isALe = a.rollNumber.startsWith('26075');
+        const isBLe = b.rollNumber.startsWith('26075');
+        if (isALe !== isBLe) return isALe ? 1 : -1;
+        return a.rollNumber.localeCompare(b.rollNumber);
+      });
+    }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      return s.rollNumber.toLowerCase().includes(q) || s.name.toLowerCase().includes(q);
+      list = list.filter(s => s.rollNumber.toLowerCase().includes(q) || s.name.toLowerCase().includes(q));
     }
-    return true;
-  });
+
+    return list.map((s, idx) => ({ ...s, sNo: idx + 1 }));
+  }, [students, batchFilter, searchQuery]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
