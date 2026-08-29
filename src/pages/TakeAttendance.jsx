@@ -503,14 +503,14 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                <th className="py-3 px-4 w-12 text-center">S.No</th>
-                <th className="py-3 px-4 w-36">Full Roll Number</th>
-                <th className="py-3 px-4">Student Name</th>
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-800/80 text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                <th className="py-3.5 px-4 w-16 text-center">S.No</th>
+                <th className="py-3.5 px-4 w-44">Full Roll Number</th>
+                <th className="py-3.5 px-4">Student Name</th>
                 {(batch === 'Batch 1' || batch === 'Batch 2') && (
-                  <th className="py-3 px-4 w-28 text-center">Batch</th>
+                  <th className="py-3.5 px-4 w-28 text-center">Batch</th>
                 )}
-                <th className="py-3 px-4 w-40 text-center">Attendance Status</th>
+                <th className="py-3.5 px-4 w-40 text-center">Attendance Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
@@ -524,6 +524,7 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
                 displayedStudents.map((student) => {
                   const isPresent = attendanceMap[student.rollNumber] === 'PRESENT';
                   const isBatchSession = batch === 'Batch 1' || batch === 'Batch 2';
+                  const isLE = student.rollNumber.startsWith('26075');
 
                   return (
                     <tr
@@ -532,16 +533,27 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
                       className={`cursor-pointer transition-colors ${
                         isPresent
                           ? 'hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20'
-                          : 'bg-red-50/30 dark:bg-red-950/20 hover:bg-red-50/60 dark:hover:bg-red-950/30'
+                          : 'bg-red-50/40 dark:bg-red-950/30 hover:bg-red-50/70 dark:hover:bg-red-950/40'
                       }`}
                     >
-                      <td className="py-3 px-4 text-center font-mono text-xs text-slate-400">
-                        {student.sNo}
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-mono font-bold text-xs">
+                          {student.sNo}
+                        </span>
                       </td>
-                      <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-slate-100">
-                        {student.rollNumber}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-extrabold text-xs sm:text-sm tracking-wide text-blue-900 dark:text-blue-200 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800">
+                            {student.rollNumber}
+                          </span>
+                          {isLE && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
+                              LE
+                            </span>
+                          )}
+                        </div>
                       </td>
-                      <td className="py-3 px-4 font-medium text-slate-800 dark:text-slate-200">
+                      <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-100">
                         {student.name}
                       </td>
                       {isBatchSession && (
