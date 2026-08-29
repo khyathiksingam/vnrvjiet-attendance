@@ -497,20 +497,23 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
                 <th className="py-3 px-4 w-12 text-center">S.No</th>
                 <th className="py-3 px-4 w-36">Full Roll Number</th>
                 <th className="py-3 px-4">Student Name</th>
-                <th className="py-3 px-4 w-28 text-center">Batch</th>
+                {(isBatchSeparated || batch !== 'All Students') && (
+                  <th className="py-3 px-4 w-28 text-center">Batch</th>
+                )}
                 <th className="py-3 px-4 w-40 text-center">Attendance Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
               {displayedStudents.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="py-8 text-center text-slate-400">
+                  <td colSpan={(isBatchSeparated || batch !== 'All Students') ? 5 : 4} className="py-8 text-center text-slate-400">
                     No students match the current filter or search criteria.
                   </td>
                 </tr>
               ) : (
                 displayedStudents.map((student) => {
                   const isPresent = attendanceMap[student.rollNumber] === 'PRESENT';
+                  const showBatch = isBatchSeparated || batch !== 'All Students';
 
                   return (
                     <tr
@@ -531,15 +534,17 @@ export default function TakeAttendance({ setTab, preselectedPeriod, onAttendance
                       <td className="py-3 px-4 font-medium text-slate-800 dark:text-slate-200">
                         {student.name}
                       </td>
-                      <td className="py-3 px-4 text-center">
-                        <span className={`px-2 py-0.5 rounded-md text-[11px] font-semibold ${
-                          student.batch === 'Batch 1'
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300'
-                            : 'bg-purple-100 text-purple-800 dark:bg-purple-900/60 dark:text-purple-300'
-                        }`}>
-                          {student.batch}
-                        </span>
-                      </td>
+                      {showBatch && (
+                        <td className="py-3 px-4 text-center">
+                          <span className={`px-2 py-0.5 rounded-md text-[11px] font-semibold ${
+                            student.batch === 'Batch 1'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300'
+                              : 'bg-purple-100 text-purple-800 dark:bg-purple-900/60 dark:text-purple-300'
+                          }`}>
+                            {student.batch}
+                          </span>
+                        </td>
+                      )}
                       <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
