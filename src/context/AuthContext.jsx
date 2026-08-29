@@ -18,9 +18,9 @@ export const AuthProvider = ({ children }) => {
       const saved = sessionStorage.getItem('vnr_user');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.displayName === 'Potta Devika' || parsed.displayName === 'Attendance Admin' || parsed.displayName === 'Administrator (Central Member)') {
+        if (parsed.displayName === 'Potta Devika' || parsed.displayName === 'Attendance Admin' || parsed.displayName === 'Administrator (Central Member)' || parsed.dept === 'CSE') {
           parsed.displayName = 'C.Rithvik';
-          parsed.dept = 'CSE';
+          parsed.dept = 'CR';
           parsed.role = 'ADMIN';
           sessionStorage.setItem('vnr_user', JSON.stringify(parsed));
         }
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
         id: 1,
         username: adminSettings.adminUsername || 'admin',
         displayName: adminSettings.adminName || 'C.Rithvik',
-        dept: adminSettings.adminDept || 'CSE',
+        dept: 'CR',
         role: 'ADMIN',
         groupName: 'Administration'
       };
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
         id: 1,
         username: adminSettings.adminUsername || 'admin',
         displayName: adminSettings.adminName || 'C.Rithvik',
-        dept: adminSettings.adminDept || 'CSE',
+        dept: 'CR',
         role: 'ADMIN',
         groupName: 'Administration'
       };

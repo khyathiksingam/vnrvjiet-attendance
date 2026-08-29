@@ -73,8 +73,8 @@ export default function Header() {
                   <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
                     {user?.displayName || 'C.Rithvik'}
                   </div>
-                  <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 leading-tight">
-                    {user?.dept || 'CSE'}
+                  <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 leading-tight">
+                    {user?.dept || 'CR'}
                   </div>
                 </div>
                 {/* Chevron */}
@@ -88,8 +88,8 @@ export default function Header() {
                     <p className="text-xs font-bold text-slate-900 dark:text-white">
                       {user?.displayName || 'C.Rithvik'}
                     </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Central Admin • {user?.dept || 'CSE'}
+                    <p className="text-[11px] font-bold text-blue-600 dark:text-blue-400">
+                      CR
                     </p>
                   </div>
 
