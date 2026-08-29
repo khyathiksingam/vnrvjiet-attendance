@@ -30,14 +30,15 @@ export const AuthProvider = ({ children }) => {
 
     const adminSettings = getAdminSettings();
     const validAdminPass = adminSettings.adminPassword || 'admin';
+    const validAdminUser = (adminSettings.adminUsername || 'admin').toLowerCase();
 
-    // Single Admin Account (Potta Devika / admin)
-    if ((u === 'admin' || u === 'potta' || u === 'potta.devika' || u === 'devika') && (p === validAdminPass || p === 'admin')) {
+    // Single Admin Account (C.Rithvik / admin)
+    if ((u === validAdminUser || u === 'admin' || u === 'rithvik' || u === 'c.rithvik') && (p === validAdminPass || p === 'admin')) {
       const adminUser = {
         id: 1,
-        username: 'admin',
-        displayName: 'Potta Devika',
-        dept: 'CSE',
+        username: adminSettings.adminUsername || 'admin',
+        displayName: adminSettings.adminName || 'C.Rithvik',
+        dept: adminSettings.adminDept || 'CSE',
         role: 'ADMIN',
         groupName: 'Administration'
       };
@@ -52,9 +53,9 @@ export const AuthProvider = ({ children }) => {
     if (u === 'admin' || p === 'admin' || p === validAdminPass) {
       const adminUser = {
         id: 1,
-        username: 'admin',
-        displayName: 'Potta Devika',
-        dept: 'CSE',
+        username: adminSettings.adminUsername || 'admin',
+        displayName: adminSettings.adminName || 'C.Rithvik',
+        dept: adminSettings.adminDept || 'CSE',
         role: 'ADMIN',
         groupName: 'Administration'
       };

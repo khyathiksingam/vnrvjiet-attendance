@@ -66,12 +66,12 @@ export default function Header() {
               >
                 {/* Avatar Icon */}
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shadow-xs shrink-0">
-                  {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'P'}
+                  {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'C'}
                 </div>
                 {/* Name & Dept */}
                 <div className="text-left hidden sm:block">
                   <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
-                    {user?.displayName || 'Potta Devika'}
+                    {user?.displayName || 'C.Rithvik'}
                   </div>
                   <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 leading-tight">
                     {user?.dept || 'CSE'}
@@ -86,7 +86,7 @@ export default function Header() {
                 <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-2 z-50 animate-in fade-in">
                   <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
                     <p className="text-xs font-bold text-slate-900 dark:text-white">
-                      {user?.displayName || 'Potta Devika'}
+                      {user?.displayName || 'C.Rithvik'}
                     </p>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Central Admin • {user?.dept || 'CSE'}
