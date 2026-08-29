@@ -23,6 +23,7 @@ import {
 import confetti from 'canvas-confetti';
 import { STUDENTS, COURSES, TIMETABLE } from '../data/masterData';
 
+// VNR VJIET Class Attendance System - Strict Batch Visibility
 export default function TakeAttendance({ setTab, preselectedPeriod, onAttendanceSaved }) {
   const { user } = useAuth();
 
