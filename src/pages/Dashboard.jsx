@@ -17,17 +17,49 @@ import {
 
 import { TIMETABLE } from '../data/masterData';
 
+// Helper to convert '10:00 AM' to minutes from midnight
+function timeStrToMinutes(timeStr) {
+  if (!timeStr) return -1;
+  const parts = timeStr.trim().split(' ');
+  if (parts.length < 2) return -1;
+  const [hoursStr, minutesStr] = parts[0].split(':');
+  let hours = parseInt(hoursStr, 10);
+  const minutes = parseInt(minutesStr, 10) || 0;
+  const period = parts[1].toUpperCase();
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+}
+
+function findLiveCurrentPeriod(scheduleList) {
+  if (!Array.isArray(scheduleList) || scheduleList.length === 0) return null;
+  const now = new Date();
+  const currentTotalMinutes = now.getHours() * 60 + now.getMinutes();
+
+  for (const period of scheduleList) {
+    const startM = period.startMinutes || timeStrToMinutes(period.startTime);
+    const endM = period.endMinutes || timeStrToMinutes(period.endTime);
+    if (startM !== -1 && endM !== -1) {
+      if (currentTotalMinutes >= startM && currentTotalMinutes < endM) {
+        return period;
+      }
+    }
+  }
+  return null;
+}
+
 export default function Dashboard({ setTab, onSelectSubjectForAttendance }) {
   const { user } = useAuth();
   
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const todayName = days[new Date().getDay()];
+  const todaySchedule = TIMETABLE[todayName] || [];
 
   const [timetableData, setTimetableData] = useState({
     day: todayName,
     isCollegeDay: todayName !== 'Sunday',
-    schedule: TIMETABLE[todayName] || [],
-    currentPeriod: (TIMETABLE[todayName] || []).find(p => p.isAttendanceRequired) || null
+    schedule: todaySchedule,
+    currentPeriod: findLiveCurrentPeriod(todaySchedule)
   });
   const [stats, setStats] = useState({
     totalSessions: 0,
@@ -40,26 +72,40 @@ export default function Dashboard({ setTab, onSelectSubjectForAttendance }) {
   const [currentTimeStr, setCurrentTimeStr] = useState('');
   const [currentDateStr, setCurrentDateStr] = useState('');
 
-  // Live clock
+  // Live clock and periodic current class check
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       setCurrentTimeStr(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }));
       setCurrentDateStr(now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+      
+      // Update running class in real time
+      setTimetableData(prev => ({
+        ...prev,
+        currentPeriod: findLiveCurrentPeriod(prev.schedule)
+      }));
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch timetable and statistics
+  // Fetch timetable and statistics from backend if available
   useEffect(() => {
     Promise.all([
       fetch('/api/timetable/current').then(r => r.ok ? r.json() : null),
       fetch('/api/reports/dashboard-stats').then(r => r.ok ? r.json() : null)
     ])
       .then(([tt, st]) => {
-        if (tt && tt.schedule) setTimetableData(tt);
+        if (tt && (tt.todaySchedule || tt.schedule)) {
+          const list = tt.todaySchedule || tt.schedule || [];
+          setTimetableData({
+            day: tt.day || todayName,
+            isCollegeDay: tt.day !== 'Sunday',
+            schedule: list,
+            currentPeriod: tt.currentPeriod || findLiveCurrentPeriod(list)
+          });
+        }
         if (st) setStats(st);
       })
       .catch(err => console.log('Dashboard backend syncing:', err));
