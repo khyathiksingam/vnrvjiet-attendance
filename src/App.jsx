@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/layout/Header';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -11,10 +11,16 @@ import History from './pages/History';
 import Students from './pages/Students';
 import TimetablePage from './pages/TimetablePage';
 import Reports from './pages/Reports';
+import Login from './pages/Login';
 
 function AppContent() {
+  const { isAuthenticated } = useAuth();
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [preselectedPeriod, setPreselectedPeriod] = useState(null);
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
 
   const handleSelectSubjectForAttendance = (period) => {
     setPreselectedPeriod(period);

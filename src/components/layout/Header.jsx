@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { Sun, Moon, Shield, GraduationCap, Key } from 'lucide-react';
+import { Sun, Moon, Shield, GraduationCap, Key, LogOut, User } from 'lucide-react';
 import AdminPermissionsModal from '../AdminPermissionsModal';
 
 export default function Header() {
+  const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
@@ -15,7 +16,7 @@ export default function Header() {
           
           {/* Logo & University Branding */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-700 dark:bg-blue-600 flex items-center justify-center text-white shadow-md">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white shadow-md">
               <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
             <div>
@@ -33,9 +34,17 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Right Controls: Admin Access & Theme Toggle */}
+          {/* Right Controls: User Profile, Admin Access, Theme Toggle, Log Out */}
           <div className="flex items-center gap-2 sm:gap-3">
             
+            {/* User Profile Badge */}
+            {user && (
+              <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-slate-700">
+                <User className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>{user.username}</span>
+              </div>
+            )}
+
             {/* Admin Permissions Button */}
             <button
               onClick={() => setIsAdminModalOpen(true)}
@@ -54,6 +63,16 @@ export default function Header() {
               aria-label="Toggle theme"
             >
               {isDark ? <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />}
+            </button>
+
+            {/* Log Out Button */}
+            <button
+              onClick={logout}
+              title="Log Out"
+              className="p-2 sm:p-2.5 rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors flex items-center gap-1 text-xs font-semibold"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden lg:inline">Log out</span>
             </button>
 
           </div>

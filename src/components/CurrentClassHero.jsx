@@ -4,25 +4,25 @@ import { PlayCircle, Clock, MapPin, User, Users, AlertCircle, ArrowRight } from 
 export default function CurrentClassHero({ currentPeriod, onTakeAttendance }) {
   if (!currentPeriod || !currentPeriod.isAttendanceRequired) {
     return (
-      <div className="bg-gradient-to-r from-slate-800 via-slate-850 to-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-slate-700/60">
+      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-2xl p-6 sm:p-7 shadow-xs border border-slate-200 dark:border-slate-800 transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-700/60 border border-slate-600/40 flex items-center justify-center text-slate-300 shrink-0">
-              <Clock className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+              <Clock className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                <span className="text-[11px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   CLASS STATUS
                 </span>
-                <span className="text-xs text-slate-400 font-medium">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   Timetable Hours: 10:00 AM – 4:40 PM
                 </span>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mt-0.5">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-0.5">
                 No class currently in session
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Classes for today have concluded or haven't started yet.
               </p>
             </div>
@@ -30,7 +30,7 @@ export default function CurrentClassHero({ currentPeriod, onTakeAttendance }) {
 
           <button
             onClick={() => onTakeAttendance({ subject: 'PSA', startTime: '10:00 AM', endTime: '11:00 AM' })}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 self-start sm:self-auto"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 self-start sm:self-auto"
           >
             <span>Record Attendance</span>
             <ArrowRight className="w-4 h-4" />
